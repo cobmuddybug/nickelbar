@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds games/data/words.json for Five Letters.
 
-    pip install wordfreq
+    Requires the wordfreq Python package (from PyPI).
     curl -LO https://raw.githubusercontent.com/dolph/dictionary/master/enable1.txt
     python3 dev/tools/words.py enable1.txt
 
