@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.cobmuddybug.nickelbar",
+  "name": "Nickelbar",
+  "version": "0.12.0",
+  "author": "Cob Muddybug",
+  "license": "MIT",
+  "description": "One hundred and twenty small games (arcade, midway, puzzle, logic, cards, board, quiz), themed live from the active Omarchy theme.",
+  "kinds": [
+    "bar-widget",
+    "overlay"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "overlay": "Overlay.qml"
+  },
+  "barWidget": {
+    "displayName": "Nickelbar",
+    "description": "Left click: picker. Right click: resume last game. Middle click: random game.",
+    "category": "Fun",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

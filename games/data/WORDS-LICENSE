@@ -1,0 +1,42 @@
+games/data/words.json (the Five Letters word lists)
+
+Guess list
+  The five-letter words of ENABLE (Enhanced North American Benchmark
+  Lexicon), compiled by Mendel Cooper with research by Alan Beale. ENABLE's
+  own README states: "The ENABLE master word list, WORD.LST, is formally
+  released into the Public Domain. Anyone is free to use it or distribute it
+  in any manner they see fit." No licence is needed for this part.
+
+Answer list
+  The ENABLE words whose frequency in wordfreq (https://github.com/rspeer/wordfreq,
+  by Robyn Speer) is at least Zipf 3.0, with plain plurals and past tenses and
+  a short blocklist removed. Only the selection of words, made with wordfreq's
+  frequency data, is taken from wordfreq; no frequency values are included.
+  wordfreq's data files are licensed under the Creative Commons
+  Attribution-ShareAlike 4.0 International licence
+  (https://creativecommons.org/licenses/by-sa/4.0/), and this list, being
+  derived from them, is under the same licence.
+
+Credits required by wordfreq's data sources
+  wordfreq compiles word frequencies from: Wikipedia; subtitles (OPUS
+  OpenSubtitles 2018 and SUBTLEX); news (NewsCrawl 2014 and GlobalVoices);
+  books (Google Books Ngrams 2012); web text (OSCAR); Twitter; Reddit; and
+  miscellaneous word-frequency lists. In particular:
+
+  - SUBTLEX: the SUBTLEX authors (Marc Brysbaert et al.) must be credited, and
+    it must remain clear that SUBTLEX is freely available data.
+  - OpenSubtitles: data from OPUS OpenSubtitles 2018, which originates from the
+    OpenSubtitles project and may be used with attribution to OpenSubtitles.
+  - Google Books Ngrams: acknowledgement of the Google Books Ngram Viewer
+    (http://books.google.com/ngrams) as the source.
+  - Creative Commons sources: the Leeds Internet Corpus (University of Leeds
+    Centre for Translation Studies), Wikipedia, the free encyclopedia, and
+    ParaCrawl, a multilingual Web crawl.
+  - Twitter data was collected by wordfreq under Twitter's Developer Agreement
+    and Policy; none of that text is included here, only word selections.
+
+  Citation: Robyn Speer. (2022). rspeer/wordfreq: v3.0 (v3.0.2). Zenodo.
+  https://doi.org/10.5281/zenodo.7199437
+
+Changes: the selection and filtering described above (see dev/tools/words.py).
+No endorsement by wordfreq, ENABLE or any of the sources above is implied.

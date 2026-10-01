@@ -1,0 +1,17 @@
+# Editor and OS clutter
+*.swp
+*~
+.DS_Store
+.idea/
+.vscode/
+
+# Scratch output from the dev harness and tools
+/tmp/
+*.log
+node_modules/
+__pycache__/
+*.pyc
+
+# Screenshots are rebuilt with `make screenshots`; only the gallery is kept
+/docs/screenshots/*.png
+!/docs/screenshots/gallery.png
