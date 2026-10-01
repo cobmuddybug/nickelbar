@@ -68,12 +68,15 @@ function step(state, dt) {
     return { x: p.x, y: p.y, r: p.r, level: p.level, life: p.life - dt }
   })
   // Work on private copies; the old state keeps its own.
-  var f = state.fruits.map(function(o) { return { id: o.id, x: o.x, y: o.y, px: o.px, py: o.py, level: o.level, age: o.age + dt } })
+  var f = state.fruits.map(function(o) { return { id: o.id, x: o.x, y: o.y, px: o.px, py: o.py, level: o.level, age: o.age + dt, calm: Math.max(0, (o.calm || 0) - dt) } })
   var h = dt / SUBSTEPS
   for (var sub = 0; sub < SUBSTEPS; ++sub) {
     for (var i = 0; i < f.length; ++i) {
       var o = f[i]
       var vx = (o.x - o.px) * 0.995, vy = (o.y - o.py) * 0.995
+      // A fresh merge spawns overlapping its neighbours; the push-out must not become a launch.
+      var vm = Math.sqrt(vx * vx + vy * vy), cap = o.calm > 0 ? 0.004 : 0.02
+      if (vm > cap) { vx *= cap / vm; vy *= cap / vm }
       o.px = o.x; o.py = o.y
       o.x += vx; o.y += vy + GRAVITY * h * h
     }
@@ -98,6 +101,10 @@ function step(state, dt) {
           var ma = ra * ra, mb = rb * rb, wa = mb / (ma + mb), wb = ma / (ma + mb)
           A.x -= dx * push * wa * 2; A.y -= dy * push * wa * 2
           B.x += dx * push * wb * 2; B.y += dy * push * wb * 2
+          if (A.calm > 0 || B.calm > 0) {   // soak up the separation so it leaves no velocity behind
+            A.px = A.x - (A.x - A.px) * 0.2; A.py = A.y - (A.y - A.py) * 0.2
+            B.px = B.x - (B.x - B.px) * 0.2; B.py = B.y - (B.y - B.py) * 0.2
+          }
         }
       }
       for (var k = 0; k < f.length; ++k) {
@@ -129,7 +136,7 @@ function merge(s, f, A, B) {
   s.pops = s.pops.concat([{ x: mx, y: my, r: RADII[A.level], level: A.level, life: 0.3 }])
   if (A.level === RADII.length - 1) { s.score += 100; return }
   var lv = A.level + 1
-  f.push({ id: s.idSeq, x: mx, y: my, px: mx, py: my, level: lv, age: 1 })
+  f.push({ id: s.idSeq, x: mx, y: my, px: mx, py: my, level: lv, age: 1, calm: 0.4 })
   s.idSeq++
   if (lv > s.biggest) s.biggest = lv
 }

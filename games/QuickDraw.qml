@@ -51,15 +51,37 @@ Engine.GameBase {
     onWidthChanged: requestPaint()
     onHeightChanged: requestPaint()
 
-    function man(ctx, x, y, h, col, armUp, down) {
-      ctx.fillStyle = col; ctx.strokeStyle = col; ctx.lineWidth = Math.max(3, h * 0.06)
+    // A gunslinger drawn facing right (face = -1 mirrors him). Hand on a holstered gun until he draws;
+    // armUp raises the arm with the revolver levelled; flash adds the muzzle blast; down tips him over backwards.
+    function man(ctx, x, y, h, col, armUp, down, face, flash) {
+      var lw = Math.max(3, h * 0.07)
       ctx.save(); ctx.translate(x, y)
       if (down) ctx.rotate(down * 1.4)
-      ctx.beginPath(); ctx.arc(0, -h * 0.82, h * 0.1, 0, Math.PI * 2); ctx.fill()               // head
-      ctx.fillRect(-h * 0.06, -h * 0.72, h * 0.12, h * 0.38)                                    // torso
-      ctx.fillRect(-h * 0.16, -h * 0.78, h * 0.32, h * 0.04)                                    // hat brim
-      ctx.beginPath(); ctx.moveTo(-h * 0.05, -h * 0.34); ctx.lineTo(-h * 0.1, 0); ctx.moveTo(h * 0.05, -h * 0.34); ctx.lineTo(h * 0.1, 0); ctx.stroke() // legs
-      ctx.beginPath(); ctx.moveTo(0, -h * 0.66); ctx.lineTo(h * 0.2 * (armUp ? 1 : 0.4), armUp ? -h * 0.66 : -h * 0.45); ctx.stroke()
+      ctx.scale(face, 1)
+      ctx.fillStyle = col; ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = "round"; ctx.lineJoin = "round"
+      // legs, torso, head
+      ctx.beginPath(); ctx.moveTo(0, -h * 0.38); ctx.lineTo(-h * 0.1, 0); ctx.moveTo(0, -h * 0.38); ctx.lineTo(h * 0.1, 0); ctx.stroke()
+      ctx.beginPath(); ctx.moveTo(0, -h * 0.7); ctx.lineTo(0, -h * 0.38); ctx.stroke()
+      ctx.beginPath(); ctx.arc(0, -h * 0.8, h * 0.075, 0, Math.PI * 2); ctx.fill()
+      // hat
+      ctx.fillRect(-h * 0.15, -h * 0.865, h * 0.3, h * 0.025)
+      ctx.fillRect(-h * 0.075, -h * 0.95, h * 0.15, h * 0.09)
+      // back arm hangs; holster rides the hip
+      ctx.beginPath(); ctx.moveTo(0, -h * 0.66); ctx.lineTo(-h * 0.09, -h * 0.46); ctx.stroke()
+      ctx.fillRect(h * 0.02, -h * 0.42, h * 0.07, h * 0.1)
+      if (armUp) {
+        var hx = h * 0.3, hy = h * 0.64
+        ctx.beginPath(); ctx.moveTo(0, -h * 0.66); ctx.lineTo(hx, -hy); ctx.stroke()
+        ctx.fillRect(hx, -hy - h * 0.025, h * 0.16, h * 0.05)                    // barrel
+        ctx.fillRect(hx - h * 0.015, -hy - h * 0.03, h * 0.05, h * 0.1)          // grip
+        if (flash) {
+          ctx.fillStyle = theme.highlight
+          var mx = hx + h * 0.16
+          ctx.beginPath(); ctx.moveTo(mx, -hy); ctx.lineTo(mx + h * 0.16, -hy - h * 0.07); ctx.lineTo(mx + h * 0.09, -hy); ctx.lineTo(mx + h * 0.16, -hy + h * 0.07); ctx.closePath(); ctx.fill()
+        }
+      } else {
+        ctx.beginPath(); ctx.moveTo(0, -h * 0.66); ctx.lineTo(h * 0.08, -h * 0.45); ctx.stroke()
+      }
       ctx.restore()
     }
 
@@ -73,8 +95,8 @@ Engine.GameBase {
       ctx.fillStyle = theme.dim; ctx.fillRect(0, ground, width, 2)
       var draw = s.phase === "draw", res = s.phase === "result"
       var oppShot = res && !s.won, meShot = res && s.won
-      man(ctx, width * 0.22, ground, h, theme.accent, draw || meShot, oppShot ? -1 : 0)
-      man(ctx, width * 0.78, ground, h, theme.tone(2), draw && s.t > s.opp * 0.6 || oppShot, meShot ? 1 : 0)
+      man(ctx, width * 0.22, ground, h, theme.accent, draw || meShot, oppShot ? -1 : 0, 1, meShot)
+      man(ctx, width * 0.78, ground, h, theme.tone(2), draw && s.t > s.opp * 0.6 || oppShot, meShot ? 1 : 0, -1, oppShot)
       // Decoy crow.
       if (s.phase === "wait" && s.fakeAt >= 0 && s.t >= s.fakeAt && s.t < s.fakeAt + 0.45) {
         var fx = width * 0.5 + (s.t - s.fakeAt) * width * 0.6, fy = height * 0.25 - (s.t - s.fakeAt) * 120

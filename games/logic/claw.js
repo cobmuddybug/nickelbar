@@ -4,13 +4,16 @@
 // Claw machine. Steer the claw over a prize and drop it; it comes down,
 // closes, lifts, and carries whatever it's holding to the chute on the
 // left. Grip depends on how centred you were and how heavy the prize is,
-// and a weak grip can slip on the way over. Ten goes; score is the value
-// of what you win (small 50, medium 150, big 400, the gold one 1000).
+// and a weak grip can slip on the way over. Every drop costs 100 of a 600
+// bank and prizes pay into it, so a small toy loses money and the game ends when you
+// can't afford another go. Score is the value of what you win (small 50, medium 150, big 400, the gold one 1000).
 //
 // Field x 0..1, y 0 (top) .. 1 (floor). Prizes are circles lying on the
 // floor pile.
 
 var TRIES = 10
+var COST = 100               // every drop costs a play
+var BANK = 600               // starting credits; winnings go back into the bank
 var CHUTE = 0.14
 var TOP = 0.08
 var KINDS = [{ r: 0.045, pts: 50, weight: 0.2 }, { r: 0.06, pts: 150, weight: 0.45 }, { r: 0.08, pts: 400, weight: 0.7 },
@@ -34,12 +37,12 @@ function makePrizes() {
 }
 
 function makeState() {
-  return { prizes: makePrizes(), x: 0.6, y: TOP, phase: "move", timer: 12, held: -1, grip: 0, tries: TRIES,
+  return { prizes: makePrizes(), x: 0.6, y: TOP, phase: "move", timer: 12, held: -1, grip: 0, tries: Math.floor(BANK / COST), credits: BANK,
            score: 0, won: [], note: "", noteLife: 0, open: 1, done: false }
 }
 
 function copy(s) {
-  return { prizes: s.prizes, x: s.x, y: s.y, phase: s.phase, timer: s.timer, held: s.held, grip: s.grip, tries: s.tries,
+  return { prizes: s.prizes, x: s.x, y: s.y, phase: s.phase, timer: s.timer, held: s.held, grip: s.grip, tries: s.tries, credits: s.credits,
            score: s.score, won: s.won, note: s.note, noteLife: s.noteLife, open: s.open, done: s.done }
 }
 
@@ -54,6 +57,8 @@ function drop(state) {
   if (state.phase !== "move" || state.done) return state
   var s = copy(state)
   s.phase = "down"
+  s.credits = state.credits - COST
+  s.tries = Math.floor(s.credits / COST)
   return s
 }
 
@@ -76,7 +81,7 @@ function step(state, dt) {
   var sp = 0.5
   if (state.phase === "move") {
     s.timer = state.timer - dt
-    if (s.timer <= 0) s.phase = "down"
+    if (s.timer <= 0) { s.phase = "down"; s.credits = state.credits - COST }
   } else if (state.phase === "down") {
     s.y = state.y + sp * dt
     var f = floorAt(state, state.x)
@@ -110,6 +115,7 @@ function step(state, dt) {
       if (s.held >= 0) {
         var won = state.prizes[s.held]
         s.score = state.score + KINDS[won.kind].pts
+        s.credits = state.credits + KINDS[won.kind].pts
         s.won = state.won.concat([won.kind])
         say(s, "WON " + KINDS[won.kind].pts + "!")
         s.prizes = state.prizes.filter(function(_, j) { return j !== s.held })
@@ -121,7 +127,7 @@ function step(state, dt) {
     s.open = Math.min(1, state.open + dt * 2)
     s.timer = state.timer - dt
     if (s.timer <= 0) {
-      s.tries = state.tries - 1
+      s.tries = Math.floor(s.credits / COST)
       if (s.tries <= 0 || !s.prizes.length) { s.done = true; return s }
       s.phase = "move"; s.timer = 12; s.x = 0.6
     }

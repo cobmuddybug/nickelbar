@@ -7,7 +7,7 @@ Engine.GameBase {
   id: root
   gameId: "claw"
   title: "CLAW MACHINE"
-  helpText: "Steer the claw over a prize and drop it · LEFT/RIGHT steer (hold to glide), SPACE or DOWN drop · 12 seconds to line up or it drops anyway · centre it: an off-centre or heavy prize can slip · ten goes; small 50, medium 150, big 400, gold 1000"
+  helpText: "Steer the claw over a prize and drop it · LEFT/RIGHT steer (hold to glide), SPACE or DOWN drop · 12 seconds to line up or it drops anyway · centre it: an off-centre or heavy prize can slip · every drop costs 100 of your 600 credits and prizes pay in: small 50, medium 150, big 400, gold 1000 · broke = game over"
   mouseHelp: "The claw follows the pointer; click drops it"
 
   property var state: null
@@ -17,9 +17,9 @@ Engine.GameBase {
   score: state ? state.score : 0
   overTitle: state ? state.won.length + " PRIZES · " + state.score : ""
   status: !state ? ""
-    : over ? "OUT OF GOES  ·  SPACE to play again"
+    : over ? "BROKE  ·  SPACE to play again"
     : paused ? "PAUSED"
-    : (state.noteLife > 0 ? state.note + "  ·  " : "") + state.tries + " goes left"
+    : (state.noteLife > 0 ? state.note + "  ·  " : "") + state.credits + " credits  ·  " + state.tries + " goes left"
       + (state.phase === "move" ? "  ·  " + Math.ceil(state.timer) + "s" : "")
 
   onTick: {

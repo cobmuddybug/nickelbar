@@ -28,7 +28,7 @@ function makeState() {
   return {
     phase: "aim", launch: 1, coins: 0, best: 0, last: 0, total: 0,
     up: { power: 0, boosts: 0, bounce: 0, shield: 0 },
-    angle: 0.75, power: 0, powerDir: 1, charging: false,
+    angle: 0.75, power: 0, powerDir: 1, charging: false, armed: false,
     kitty: null, objects: [], genX: 0, cam: { x: 0, y: 0 }, t: 0, spin: 0,
     boostsLeft: 0, shieldLeft: 0, pops: [], shopCursor: 0, msg: "LAUNCH 1", msgT: 1.5, done: false, stopT: 0, trapped: false, booms: [], prevBoost: false
   }
@@ -88,7 +88,9 @@ function step(state, input, dt) {
 
   if (s.phase === "aim") {
     if (input.dy) s.angle = Math.max(0.15, Math.min(1.45, s.angle - input.dy * 1.2 * dt))
-    if (input.hold) {
+    // The press that started this aim phase (SPACE on LAUNCH / new game) must be released before power can build.
+    if (!input.hold) s.armed = true
+    if (input.hold && s.armed) {
       s.charging = true
       var pm = Meter.swing(s.power, s.powerDir, dt, 0.9, 0.2, 1)
       s.power = pm.v; s.powerDir = pm.dir
@@ -169,7 +171,7 @@ function buy(state, i) {
   if (i >= SHOP.length) {
     // The last row is "launch".
     var s0 = shallow(state)
-    s0.launch++; s0.phase = "aim"; s0.kitty = null; s0.msg = "LAUNCH " + s0.launch; s0.msgT = 1.5
+    s0.launch++; s0.phase = "aim"; s0.armed = false; s0.kitty = null; s0.msg = "LAUNCH " + s0.launch; s0.msgT = 1.5
     return s0
   }
   var item = SHOP[i], lvl = state.up[item.id]

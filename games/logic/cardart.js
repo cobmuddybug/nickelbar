@@ -62,20 +62,31 @@ function back(ctx, theme, r) {
   roundRect(ctx, r.x + m, r.y + m, r.w - m * 2, r.h - m * 2, radius(r) * 0.6)
   ctx.strokeStyle = theme.withAlpha(theme.accent, 0.45)
   ctx.stroke()
-  // Prize patterns, clipped to the inset frame.
+  // Prize patterns, clipped to the inset frame. Each prize also recolours the
+  // whole back so it reads at a glance, not just as faint line work.
   if (BACK > 0) {
+    var col = BACK === 3 ? theme.highlight : BACK === 2 ? theme.tone(2) : theme.tone(1)
+    roundRect(ctx, r.x, r.y, r.w, r.h, radius(r))
+    ctx.fillStyle = theme.withAlpha(col, BACK === 3 ? 0.5 : 0.4)
+    ctx.fill()
+    roundRect(ctx, r.x, r.y, r.w, r.h, radius(r))
+    ctx.strokeStyle = theme.withAlpha(col, 1)
+    ctx.lineWidth = BACK === 3 ? 2 : 1.5
+    ctx.stroke()
     ctx.save()
     roundRect(ctx, r.x + m, r.y + m, r.w - m * 2, r.h - m * 2, radius(r) * 0.6)
     ctx.clip()
-    var col = BACK === 3 ? theme.highlight : theme.accent, step = Math.max(5, r.w * 0.16)
-    ctx.strokeStyle = theme.withAlpha(col, BACK === 3 ? 0.55 : 0.4); ctx.lineWidth = 1
+    var step = Math.max(5, r.w * 0.16)
+    ctx.strokeStyle = theme.withAlpha(theme.foreground, 0.75)
+    ctx.lineWidth = BACK === 2 ? Math.max(1.5, step * 0.3) : 1.5
     ctx.beginPath()
     if (BACK === 1) {                       // lattice of diamonds
       for (var i = -r.h; i < r.w + r.h; i += step) { ctx.moveTo(r.x + i, r.y); ctx.lineTo(r.x + i + r.h, r.y + r.h); ctx.moveTo(r.x + i + r.h, r.y); ctx.lineTo(r.x + i, r.y + r.h) }
     } else if (BACK === 2) {                // stripes
-      for (var j = 0; j < r.w; j += step * 0.7) { ctx.moveTo(r.x + j, r.y); ctx.lineTo(r.x + j, r.y + r.h) }
+      for (var j = 0; j < r.w; j += step * 0.9) { ctx.moveTo(r.x + j, r.y); ctx.lineTo(r.x + j, r.y + r.h) }
     } else {                                // gold: a double lattice and a centre medallion
       for (var q = -r.h; q < r.w + r.h; q += step * 1.2) { ctx.moveTo(r.x + q, r.y); ctx.lineTo(r.x + q + r.h, r.y + r.h) }
+      ctx.moveTo(r.x + r.w / 2 + Math.min(r.w, r.h) * 0.2, r.y + r.h / 2)
       ctx.arc(r.x + r.w / 2, r.y + r.h / 2, Math.min(r.w, r.h) * 0.2, 0, Math.PI * 2)
     }
     ctx.stroke()
