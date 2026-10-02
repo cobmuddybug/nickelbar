@@ -57,7 +57,7 @@ function launch(s, power) {
   var o = copy(s)
   var v = 3.2 + clamp(power, 0, 1) * 3.8
   o.b = { x: s.x, y: 0, vx: v * Math.sin(s.angle), vy: v * Math.cos(s.angle), gutter: false, gone: false }
-  o.pins = s.pins.map(function(p) { return { x: p.x, y: p.y, vx: 0, vy: 0, down: false, gone: false } })
+  o.pins = s.pins.map(function(p) { return { x: p.x, y: p.y, vx: 0, vy: 0, down: false, gone: p.gone } })
   o.phase = "roll"; o.settle = 0
   o.ev = ["thud"]; o.evSeq = (s.evSeq || 0) + 1
   return o
